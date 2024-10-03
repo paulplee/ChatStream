@@ -176,6 +176,25 @@ curl --include \
 
 Note: This CURL command initiates a WebSocket connection but doesn't send or receive messages. For full WebSocket communication, you'll need to use a WebSocket client or the provided Flutter frontend.
 
+### Testing the /chat endpoint using Postman
+
+To test the /chat WebSocket endpoint using Postman, follow these steps:
+
+1. Open Postman and create a new request.
+2. Set the request type to "WebSocket Request".
+3. Enter the WebSocket URL: `ws://localhost:8000/chat`
+4. Click on "Connect" to establish a WebSocket connection.
+5. Once connected, you can send messages in the "Message" field at the bottom.
+6. To send a message, type your question in the "Message" field and click "Send".
+7. You should see the response streaming back word by word in the "Messages" section.
+
+Example:
+1. Connect to the WebSocket.
+2. Send a message: "What are the benefits of regular exercise?"
+3. Observe the response streaming back in real-time.
+
+Note: Make sure your backend server is running before attempting to connect via Postman.
+
 ## Deployment
 
 This project can be self-hosted or deployed to a public cloud service like AWS or Azure. Make sure to set up the necessary environment variables and adjust the WebSocket URL in the frontend code to match your deployed backend URL.
