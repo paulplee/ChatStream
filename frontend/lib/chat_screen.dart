@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'chat_provider.dart';
 import 'message_bubble.dart';
@@ -19,7 +20,11 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     // Request focus when the widget is first built
-    _focusNode.requestFocus();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNode.requestFocus();
+      }
+    });
   }
 
   @override
@@ -34,11 +39,13 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     Provider.of<ChatProvider>(context, listen: false).sendMessage(text);
     _scrollToBottom();
-    _focusNode.requestFocus();
+    if (mounted) {
+      _focusNode.requestFocus();
+    }
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -51,11 +58,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure focus is maintained
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
@@ -79,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Consumer<ChatProvider>(
               builder: (context, chatProvider, child) {
-                WidgetsBinding.instance
+                SchedulerBinding.instance
                     .addPostFrameCallback((_) => _scrollToBottom());
                 return ListView.builder(
                   controller: _scrollController,
@@ -114,12 +116,15 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Row(
           children: [
             Flexible(
-              child: TextField(
-                controller: _textController,
-                focusNode: _focusNode,
-                onSubmitted: _handleSubmitted,
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'Send a message',
+              child: SizedBox(
+                height: 48.0, // Provide a fixed height
+                child: TextField(
+                  controller: _textController,
+                  focusNode: _focusNode,
+                  onSubmitted: _handleSubmitted,
+                  decoration: const InputDecoration.collapsed(
+                    hintText: 'Send a message',
+                  ),
                 ),
               ),
             ),
