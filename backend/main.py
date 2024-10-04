@@ -23,11 +23,17 @@ app.add_middleware(
 )
 
 # Load OpenAI API key from environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 
-if not openai.api_key:
+if not api_key:
     logger.error("OpenAI API key is missing. Please set it in the .env file.")
     raise ValueError("OpenAI API key is missing")
+
+
+if hasattr(openai, "OpenAI"):  # New version (1.x.x)
+    client = openai.OpenAI(api_key=api_key)
+else:  # Old version (0.x.x)
+    openai.api_key = api_key
 
 
 @app.websocket("/chat")
@@ -43,19 +49,32 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Create a chat completion with streaming
             logger.info("Calling OpenAI API")
-            stream = openai.ChatCompletion.create(
-                model=model,
-                messages=[{"role": "user", "content": question}],
-                stream=True,
-            )
-
-            # Stream the response
-            logger.info("Streaming response from OpenAI")
-            for chunk in stream:
-                if chunk["choices"][0]["delta"].get("content"):
-                    content = chunk["choices"][0]["delta"]["content"]
-                    await websocket.send_text(content)
-                    logger.debug(f"Sent chunk: {content}")
+            if hasattr(openai, "OpenAI"):  # New version (1.x.x)
+                stream = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": question}],
+                    stream=True,
+                )
+                # Stream the response
+                logger.info("Streaming response from OpenAI")
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        content = chunk.choices[0].delta.content
+                        await websocket.send_text(content)
+                        logger.debug(f"Sent chunk: {content}")
+            else:  # Old version (0.x.x)
+                stream = openai.ChatCompletion.create(
+                    model=model,
+                    messages=[{"role": "user", "content": question}],
+                    stream=True,
+                )
+                # Stream the response
+                logger.info("Streaming response from OpenAI")
+                for chunk in stream:
+                    if chunk["choices"][0]["delta"].get("content"):
+                        content = chunk["choices"][0]["delta"]["content"]
+                        await websocket.send_text(content)
+                        logger.debug(f"Sent chunk: {content}")
 
             # Send a newline to indicate the end of the response
             await websocket.send_text("\n")
