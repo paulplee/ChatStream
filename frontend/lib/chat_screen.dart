@@ -12,12 +12,21 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Request focus when the widget is first built
+    _focusNode.requestFocus();
+  }
 
   @override
   void dispose() {
     _textController.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -25,6 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     Provider.of<ChatProvider>(context, listen: false).sendMessage(text);
     _scrollToBottom();
+    _focusNode.requestFocus();
   }
 
   void _scrollToBottom() {
@@ -41,9 +51,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure focus is maintained
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ChatStream'),
+        title: const Text('Chat'),
       ),
       body: Column(
         children: [
@@ -101,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Flexible(
               child: TextField(
                 controller: _textController,
+                focusNode: _focusNode,
                 onSubmitted: _handleSubmitted,
                 decoration: const InputDecoration.collapsed(
                   hintText: 'Send a message',
