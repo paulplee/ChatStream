@@ -13,11 +13,11 @@ mkdir -p logs
 ) &
 
 # Start the Flutter frontend in debug mode with verbose logging
-(
-    cd frontend && \
-    flutter pub get && \
-    flutter run -d chrome 2>&1 | tee ../logs/frontend.log
-) &
+#(
+#    cd frontend && \
+#    flutter pub get && \
+#    flutter run -d chrome 2>&1 | tee ../logs/frontend.log
+#) &
 
 # Wait for both processes to finish
 wait
