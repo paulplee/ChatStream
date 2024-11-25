@@ -31,15 +31,17 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
           Expanded(
             child: Consumer<AssistantChatProvider>(
               builder: (context, chatProvider, child) {
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _scrollToBottom());
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: chatProvider.messages.length,
                   itemBuilder: (context, index) {
                     final message = chatProvider.messages[index];
                     return MessageBubble(
-                      content: message.text,
-                      isUser: message.isUserMessage,
+                      text: message.text,
+                      isUserMessage: message.isUserMessage,
+                      timestamp: message.timestamp,
                     );
                   },
                 );
@@ -75,7 +77,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
   void _handleSubmitted(String text) {
     if (text.isNotEmpty) {
       _textController.clear();
-      Provider.of<AssistantChatProvider>(context, listen: false).sendMessage(text);
+      Provider.of<AssistantChatProvider>(context, listen: false)
+          .sendMessage(text);
     }
   }
 
