@@ -50,7 +50,7 @@ class AssistantChatProvider with ChangeNotifier {
   }
 
   void _onError(error) {
-    print('WebSocket error: $error');
+    // print('WebSocket error: $error');
     _isConnected = false;
     notifyListeners();
   }

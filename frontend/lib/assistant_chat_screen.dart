@@ -4,6 +4,8 @@ import 'assistant_chat_provider.dart';
 import 'message_bubble.dart';
 
 class AssistantChatScreen extends StatefulWidget {
+  const AssistantChatScreen({super.key});
+
   @override
   _AssistantChatScreenState createState() => _AssistantChatScreenState();
 }
@@ -24,7 +26,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Assistant Chat'),
+        title: const Text('Assistant Chat'),
       ),
       body: Column(
         children: [
@@ -55,7 +57,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _textController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Type a message...',
                       border: OutlineInputBorder(),
                     ),
@@ -63,7 +65,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: () => _handleSubmitted(_textController.text),
                 ),
               ],
@@ -86,7 +88,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     }

@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                  MaterialPageRoute(builder: (context) => const ChatScreen()),
                 );
               },
               child: const Text('Regular Chat'),
@@ -60,7 +60,8 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AssistantChatScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const AssistantChatScreen()),
                 );
               },
               child: const Text('Assistant Chat'),
