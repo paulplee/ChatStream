@@ -1,6 +1,5 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-import openai
 import os
 from dotenv import load_dotenv
 import logging
@@ -37,6 +36,7 @@ client = OpenAI(api_key=api_key, project=project_id)
 thread_id = "thread_9i2XlaaHde1L2qlOBlThc4l0"
 assistant_id = "asst_4dY2Iow6NOAFcDfnUaKWPPK2"
 
+
 @app.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -72,6 +72,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.close()
             break
 
+
 class WebSocketEventHandler(AssistantEventHandler):
     def __init__(self, websocket: WebSocket):
         self.websocket = websocket
@@ -79,16 +80,16 @@ class WebSocketEventHandler(AssistantEventHandler):
     @override
     async def on_text_created(self, text) -> None:
         await self.websocket.send_text("\nassistant > ")
-      
+
     @override
     async def on_text_delta(self, delta, snapshot):
         await self.websocket.send_text(delta.value)
-      
+
     async def on_tool_call_created(self, tool_call):
         await self.websocket.send_text(f"\nassistant > {tool_call.type}\n")
-  
+
     async def on_tool_call_delta(self, delta, snapshot):
-        if delta.type == 'code_interpreter':
+        if delta.type == "code_interpreter":
             if delta.code_interpreter.input:
                 await self.websocket.send_text(delta.code_interpreter.input)
             if delta.code_interpreter.outputs:
@@ -97,11 +98,12 @@ class WebSocketEventHandler(AssistantEventHandler):
                     if output.type == "logs":
                         await self.websocket.send_text(f"\n{output.logs}")
 
+
 @app.websocket("/asst")
 async def assistant_websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     logger.info("Assistant WebSocket connection established")
-    
+
     while True:
         try:
             # Receive the client message
@@ -109,14 +111,12 @@ async def assistant_websocket_endpoint(websocket: WebSocket):
             logger.info(f"Received input: {user_input}")
 
             # Create a message in the thread
-            message = client.beta.threads.messages.create(
-                thread_id=thread_id,
-                role="user",
-                content=user_input
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=user_input
             )
 
             # Create a run with the assistant
-            run = client.beta.threads.runs.create(
+            client.beta.threads.runs.create(
                 thread_id=thread_id,
                 assistant_id=assistant_id,
             )
@@ -141,6 +141,7 @@ async def assistant_websocket_endpoint(websocket: WebSocket):
             logger.error(f"Error in Assistant WebSocket connection: {str(e)}")
             await websocket.close()
             break
+
 
 if __name__ == "__main__":
     import uvicorn
